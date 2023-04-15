@@ -46,7 +46,7 @@ vim.keymap.set("n", "<leader>wt", require('wezterm').switch_tab.index)
 
 </details>
 
-Spawn a program in wezterm
+#### Spawn a program in wezterm
 
 ```lua
 wezterm.spawn(program, opts)
@@ -59,7 +59,7 @@ wezterm.spawn(program, opts)
 - cwd? (string): Set the cwd for the spawned program
 - args? (string[]): Args to pass to the program
 
-Switch tabs by relative number
+#### Switch tabs by relative number
 
 ```lua
 wezterm.switch_tab.relative(relno)
@@ -67,7 +67,7 @@ wezterm.switch_tab.relative(relno)
 
 - relno (number): The relative number to switch to (-1 for prev, 1 for next, etc.)
 
-Switch tabs by index
+#### Switch tabs by index
 
 ```lua
 wezterm.switch_tab.index(index)
@@ -75,7 +75,7 @@ wezterm.switch_tab.index(index)
 
 - index (number): The index of the tab to switch to (0-indexed)
 
-Switch tabs by id
+#### Switch tabs by id
 
 ```lua
 wezterm.switch_tab.id(id)
@@ -83,13 +83,15 @@ wezterm.switch_tab.id(id)
 
 - id (number): The id of the tab to switch to
 
-Switch panes by id
+#### Switch panes by id
 
 ```lua
 wezterm.switch_pane.id(id)
 ```
 
 - id (number): The id of the pane to switch to
+
+#### Switch panes by direction
 
 ```lua
 wezterm.switch_pane.direction(direction)
