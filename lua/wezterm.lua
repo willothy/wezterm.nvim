@@ -66,6 +66,9 @@ end
 ---@param relno number The relative number of tabs to switch
 ---Switch to the tab relative to the current tab
 function wezterm.switch_tab.relative(relno)
+	if not relno then
+		relno = vim.v.count or 0
+	end
 	local _handle, _pid = uv.spawn("wezterm", {
 		args = { "cli", "activate-tab", "--tab-relative", fmt("%d", relno) },
 	}, function(code, _signal)
@@ -78,6 +81,9 @@ end
 ---@param index number The absolute index of the tab to switch to
 ---Switch to the tab with the given index
 function wezterm.switch_tab.index(index)
+	if not index then
+		index = vim.v.count or 0
+	end
 	local _handle, _pid = uv.spawn("wezterm", {
 		args = { "cli", "activate-tab", "--tab-index", fmt("%d", index) },
 	}, function(code, _signal)
@@ -90,6 +96,9 @@ end
 ---@param id number The id of the tab to switch to
 ---Switch to the tab with the given id
 function wezterm.switch_tab.id(id)
+	if not id then
+		id = vim.v.count or 0
+	end
 	local _handle, _pid = uv.spawn("wezterm", {
 		args = { "cli", "activate-tab", "--tab-id", fmt("%d", id) },
 	}, function(code, _signal)
@@ -102,6 +111,9 @@ end
 ---@param id number The id of the pane to switch to
 ---Switch to the given pane
 function wezterm.switch_pane.id(id)
+	if not id then
+		id = vim.v.count or 0
+	end
 	local _handle, _pid = uv.spawn("wezterm", {
 		args = { "cli", "activate-pane", "--pane-id", fmt("%d", id) },
 	}, function(code, _signal)
@@ -111,9 +123,22 @@ function wezterm.switch_pane.id(id)
 	end)
 end
 
+---Used for validating directions
+local directions = {
+	Up = true,
+	Down = true,
+	Left = true,
+	Right = true,
+	Next = true,
+	Prev = true,
+}
+
 ---@param direction "Up"|"Down"|"Left"|"Right"|"Next"|"Prev" The direction to switch to
 ---Switch pane in the given direction
 function wezterm.switch_pane.direction(direction)
+	if not direction or not directions[direction] then
+		return
+	end
 	local _handle, _pid = uv.spawn("wezterm", {
 		args = { "cli", "activate-pane-direction", direction },
 	}, function(code, _signal)
