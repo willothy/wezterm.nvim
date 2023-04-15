@@ -8,6 +8,7 @@ end
 local wezterm = {
 	switch_tab = {},
 	switch_pane = {},
+	split_pane = {},
 }
 
 ---@param args string[]
@@ -15,6 +16,92 @@ local wezterm = {
 ---Exec an arbitrary command in wezterm (does not return result)
 function wezterm.exec(args, handler)
 	uv.spawn("wezterm", { args = args }, handler)
+end
+
+---@param opts SplitOpts
+---@class SplitOpts
+---@field pane? number The pane to split (default current)
+---@field top? boolean (default false)
+---@field move_pane? number|nil Move a pane instead of spawning a command in it (default nil/disabled)
+---@field percent? number|nil The percentage of the pane to split (default nil)
+---@field program string[]|nil The program to spawn in the new pane (default nil/Wezterm default)
+---@field top_level boolean Split the window instead of the pane (default false)
+function wezterm.split_pane.vertical(opts)
+	opts = opts or {}
+	local args = { "cli", "split-pane" }
+	if opts.top then
+		table.insert(args, "--top")
+	end
+	if opts.percent then
+		table.insert(args, "--percent")
+		table.insert(args, fmt("%d", opts.percent))
+	end
+	if opts.pane then
+		table.insert(args, "--pane-id")
+		table.insert(args, fmt("%d", opts.pane))
+	end
+	if opts.top_level then
+		table.insert(args, "--top-level")
+	end
+	if opts.move_pane then
+		if opts.program then
+			err("split: move_pane and program are mutually exclusive")
+			return
+		end
+	elseif opts.program then
+		for _, arg in ipairs(opts.program) do
+			table.insert(args, arg)
+		end
+	end
+	wezterm.exec(args, function(code)
+		if code ~= 0 then
+			err("split pane")
+		end
+	end)
+end
+
+---@param opts SplitOpts
+---@class SplitOpts
+---@field left? boolean (default false)
+---@field pane? number The pane to split (default current)
+---@field move_pane? number|nil Move a pane instead of spawning a command in it (default nil/disabled)
+---@field percent? number|nil The percentage of the pane to split (default nil)
+---@field program string[]|nil The program to spawn in the new pane (default nil/Wezterm default)
+---@field top_level boolean Split the window instead of the pane (default false)
+function wezterm.split_pane.horizontal(opts)
+	opts = opts or {}
+	local args = { "cli", "split-pane" }
+	if opts.left then
+		table.insert(args, "--left")
+	else
+		table.insert(args, "--horizontal")
+	end
+	if opts.percent then
+		table.insert(args, "--percent")
+		table.insert(args, fmt("%d", opts.percent))
+	end
+	if opts.pane then
+		table.insert(args, "--pane-id")
+		table.insert(args, fmt("%d", opts.pane))
+	end
+	if opts.top_level then
+		table.insert(args, "--top-level")
+	end
+	if opts.move_pane then
+		if opts.program then
+			err("split: move_pane and program are mutually exclusive")
+			return
+		end
+	elseif opts.program then
+		for _, arg in ipairs(opts.program) do
+			table.insert(args, arg)
+		end
+	end
+	wezterm.exec(args, function(code)
+		if code ~= 0 then
+			err("split pane")
+		end
+	end)
 end
 
 function wezterm.set_tab_title(title, id)

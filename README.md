@@ -30,7 +30,7 @@ If you don't want the `WeztermSpawn` user command, use
 
 ## Usage
 
-### Functions
+### Functions: General
 
 <details>
 <summary>
@@ -59,6 +59,35 @@ wezterm.spawn(program, opts)
 - cwd? (string): Set the cwd for the spawned program
 - args? (string[]): Args to pass to the program
 
+#### Execute any wezterm CLI command (does not yet return result)
+
+```lua
+wezterm.exec(args, handler)
+```
+
+- args (string[]): Wezterm CLI arguments
+- handler (fun(exitcode, signal))
+
+#### Set window title
+
+```lua
+wezterm.set_window_title(title, id)
+```
+
+- title (string): The new window title
+- id? (number): Optional window id to set (defaults to current tab)
+
+### Functions: Tabs
+
+#### Set tab title
+
+```lua
+wezterm.set_tab_title(title, id)
+```
+
+- title (string): The new tab title
+- id? (number): Optional tab id to set (defaults to current tab)
+
 #### Switch tabs by relative number
 
 ```lua
@@ -82,6 +111,36 @@ wezterm.switch_tab.id(id)
 ```
 
 - id (number): The id of the tab to switch to
+
+### Functions: Panes
+
+#### Split pane vertically
+
+```lua
+wezterm.split_pane.vertical(opts)
+```
+
+- opts (table):
+  - pane? (number): The pane to split (default current)
+  - top? (boolean): Place the pane on top (default bottom)
+  - percent? (number): The percentage of the pane that the split should take up (default 50%)
+  - top_level? (boolean): Split the top level window instead of the selected pane
+  - move_pane? (boolean): Move the pane instead of spawning a command in it (cannot be used with program)
+  - program? (string): The program to spawn in the new pane (wezterm default if nil)
+
+#### Split pane horizontally
+
+```lua
+wezterm.split_pane.horizontal(opts)
+```
+
+- opts (table):
+  - pane? (number): The pane to split (default current)
+  - left? (boolean): Place the pane on the left (default right)
+  - percent? (number): The percentage of the pane that the split should take up (default 50%)
+  - top_level? (boolean): Split the top level window instead of the selected pane
+  - move_pane? (boolean): Move the pane instead of spawning a command in it (cannot be used with program)
+  - program? (string): The program to spawn in the new pane (wezterm default if nil)
 
 #### Switch panes by id
 
