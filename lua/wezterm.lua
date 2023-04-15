@@ -124,7 +124,7 @@ function wezterm.switch_pane.direction(direction)
 end
 
 function wezterm.create_commands()
-	vim.api.nvim_create_user_command("WeztermSpawn", "lua require('willothy.wezterm').spawn(<f-args>)", {
+	vim.api.nvim_create_user_command("WeztermSpawn", "lua require('wezterm').spawn(<f-args>)", {
 		nargs = "*",
 		complete = "shellcmd",
 	})
