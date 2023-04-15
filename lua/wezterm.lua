@@ -1,7 +1,7 @@
 local uv = vim.loop
 local fmt = string.format
 
-local err = function(e)
+local function err(e)
 	vim.notify("Wezterm failed to " .. e, vim.log.levels.ERROR, {})
 end
 
@@ -9,6 +9,51 @@ local wezterm = {
 	switch_tab = {},
 	switch_pane = {},
 }
+
+---@param args string[]
+---@param handler fun(exit_code, signal)
+---Exec an arbitrary command in wezterm (does not return result)
+function wezterm.exec(args, handler)
+	uv.spawn("wezterm", { args = args }, handler)
+end
+
+function wezterm.set_tab_title(title, id)
+	if not title then
+		return
+	end
+	local args = { "cli", "set-tab-title" }
+	if id then
+		table.insert(args, "--tab-id")
+		table.insert(args, fmt("%d", id))
+		table.insert(args, title)
+	else
+		table.insert(args, title)
+	end
+	wezterm.exec(args, function(code, _signal)
+		if code ~= 0 then
+			err("set tab title to '" .. title .. (id == nil and "'" or "' for tab " .. id))
+		end
+	end)
+end
+
+function wezterm.set_win_title(title, id)
+	if not title then
+		return
+	end
+	local args = { "cli", "set-window-title" }
+	if id then
+		table.insert(args, "--window-id")
+		table.insert(args, fmt("%d", id))
+		table.insert(args, title)
+	else
+		table.insert(args, title)
+	end
+	wezterm.exec(args, function(code, _signal)
+		if code ~= 0 then
+			err("set window title to '" .. title .. (id == nil and "'" or ("' for window " .. id)))
+		end
+	end)
+end
 
 ---@param program string
 ---@class SpawnOpts
@@ -54,9 +99,7 @@ function wezterm.spawn(program, opts)
 		end
 	end
 
-	uv.spawn("wezterm", {
-		args = args,
-	}, function(code, _signal)
+	wezterm.exec(args, function(code, _signal)
 		if code ~= 0 then
 			err("spawn " .. program .. " " .. table.concat(args, " "))
 		end
@@ -69,9 +112,7 @@ function wezterm.switch_tab.relative(relno)
 	if not relno then
 		relno = vim.v.count or 0
 	end
-	local _handle, _pid = uv.spawn("wezterm", {
-		args = { "cli", "activate-tab", "--tab-relative", fmt("%d", relno) },
-	}, function(code, _signal)
+	wezterm.exec({ "cli", "activate-tab", "--tab-relative", fmt("%d", relno) }, function(code, _signal)
 		if code ~= 0 then
 			err("activate tab relative " .. relno)
 		end
@@ -84,9 +125,7 @@ function wezterm.switch_tab.index(index)
 	if not index then
 		index = vim.v.count or 0
 	end
-	local _handle, _pid = uv.spawn("wezterm", {
-		args = { "cli", "activate-tab", "--tab-index", fmt("%d", index) },
-	}, function(code, _signal)
+	wezterm.exec({ "cli", "activate-tab", "--tab-index", fmt("%d", index) }, function(code, _signal)
 		if code ~= 0 then
 			err("activate tab by index " .. index)
 		end
@@ -99,9 +138,7 @@ function wezterm.switch_tab.id(id)
 	if not id then
 		id = vim.v.count or 0
 	end
-	local _handle, _pid = uv.spawn("wezterm", {
-		args = { "cli", "activate-tab", "--tab-id", fmt("%d", id) },
-	}, function(code, _signal)
+	wezterm.exec({ "cli", "activate-tab", "--tab-id", fmt("%d", id) }, function(code, _signal)
 		if code ~= 0 then
 			err("activate tab by id " .. id)
 		end
@@ -114,9 +151,7 @@ function wezterm.switch_pane.id(id)
 	if not id then
 		id = vim.v.count or 0
 	end
-	local _handle, _pid = uv.spawn("wezterm", {
-		args = { "cli", "activate-pane", "--pane-id", fmt("%d", id) },
-	}, function(code, _signal)
+	wezterm.exec({ "cli", "activate-pane", "--pane-id", fmt("%d", id) }, function(code, _signal)
 		if code ~= 0 then
 			err("activate pane by id " .. id)
 		end
@@ -139,9 +174,7 @@ function wezterm.switch_pane.direction(direction)
 	if not direction or not directions[direction] then
 		return
 	end
-	local _handle, _pid = uv.spawn("wezterm", {
-		args = { "cli", "activate-pane-direction", direction },
-	}, function(code, _signal)
+	wezterm.exec({ "cli", "activate-pane-direction", direction }, function(code, _signal)
 		if code ~= 0 then
 			err("activate pane by direction " .. direction)
 		end
