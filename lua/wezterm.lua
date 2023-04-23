@@ -5,17 +5,31 @@ local function err(e)
 	vim.notify("Wezterm failed to " .. e, vim.log.levels.ERROR, {})
 end
 
+local function find_wezterm()
+	if vim.fn.executable("wezterm") ~= 0 then
+		return "wezterm"
+	end
+	if vim.fn.executable("wezterm.exe") ~= 0 then
+		return "wezterm.exe"
+	end
+
+	err("find 'wezterm' executable")
+	return nil
+end
+
 local wezterm = {
 	switch_tab = {},
 	switch_pane = {},
 	split_pane = {},
 }
 
+local wezterm_executable = ''
+
 ---@param args string[]
 ---@param handler fun(exit_code, signal)
 ---Exec an arbitrary command in wezterm (does not return result)
 function wezterm.exec(args, handler)
-	uv.spawn("wezterm", { args = args }, handler)
+	uv.spawn(wezterm_executable, { args = args }, handler)
 end
 
 ---@param opts SplitOpts
@@ -281,6 +295,8 @@ local config = {
 
 function wezterm.setup(opts)
 	opts = vim.tbl_deep_extend("force", config, opts or {})
+
+	wezterm_executable = find_wezterm()
 
 	if opts.create_commands == true then
 		wezterm.create_commands()
