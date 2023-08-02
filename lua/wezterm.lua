@@ -23,151 +23,32 @@ local wezterm = {
 	split_pane = {},
 }
 
-local wezterm_executable = ''
+local wezterm_executable = ""
 
----@param args string[]
----@param handler fun(exit_code, signal)
----Exec an arbitrary command in wezterm (does not return result)
-function wezterm.exec(args, handler)
-	uv.spawn(wezterm_executable, { args = args }, handler)
-end
-
----@param opts SplitOpts
----@class SplitOpts
+---@class Wezterm.SplitOpts
 ---@field pane? number The pane to split (default current)
 ---@field top? boolean (default false)
 ---@field move_pane? number|nil Move a pane instead of spawning a command in it (default nil/disabled)
 ---@field percent? number|nil The percentage of the pane to split (default nil)
 ---@field program string[]|nil The program to spawn in the new pane (default nil/Wezterm default)
----@field top_level boolean Split the window instead of the pane (default false)
-function wezterm.split_pane.vertical(opts)
-	opts = opts or {}
-	local args = { "cli", "split-pane" }
-	if opts.top then
-		table.insert(args, "--top")
-	end
-	if opts.percent then
-		table.insert(args, "--percent")
-		table.insert(args, fmt("%d", opts.percent))
-	end
-	if opts.pane then
-		table.insert(args, "--pane-id")
-		table.insert(args, fmt("%d", opts.pane))
-	end
-	if opts.top_level then
-		table.insert(args, "--top-level")
-	end
-	if opts.move_pane then
-		if opts.program then
-			err("split: move_pane and program are mutually exclusive")
-			return
-		end
-	elseif opts.program then
-		for _, arg in ipairs(opts.program) do
-			table.insert(args, arg)
-		end
-	end
-	wezterm.exec(args, function(code)
-		if code ~= 0 then
-			err("split pane")
-		end
-	end)
+---@field top_level boolean Split the window instead of the pane (default false)-
+
+---@class Wezterm.SpawnOpts
+---@field pane? number Set the current pane
+---@field new_window? boolean Open in a new window
+---@field workspace? string Set the workspace for the new window (requires new window)
+---@field cwd? string Set the cwd for the spawned program
+
+---Exec an arbitrary command in wezterm (does not return result)
+---@param args string[]
+---@param handler fun(exit_code, signal)
+function wezterm.exec(args, handler)
+	uv.spawn(wezterm_executable, { args = args }, handler)
 end
 
----@param opts SplitOpts
----@class SplitOpts
----@field left? boolean (default false)
----@field pane? number The pane to split (default current)
----@field move_pane? number|nil Move a pane instead of spawning a command in it (default nil/disabled)
----@field percent? number|nil The percentage of the pane to split (default nil)
----@field program string[]|nil The program to spawn in the new pane (default nil/Wezterm default)
----@field top_level boolean Split the window instead of the pane (default false)
-function wezterm.split_pane.horizontal(opts)
-	opts = opts or {}
-	local args = { "cli", "split-pane" }
-	if opts.left then
-		table.insert(args, "--left")
-	else
-		table.insert(args, "--horizontal")
-	end
-	if opts.percent then
-		table.insert(args, "--percent")
-		table.insert(args, fmt("%d", opts.percent))
-	end
-	if opts.pane then
-		table.insert(args, "--pane-id")
-		table.insert(args, fmt("%d", opts.pane))
-	end
-	if opts.top_level then
-		table.insert(args, "--top-level")
-	end
-	if opts.move_pane then
-		if opts.program then
-			err("split: move_pane and program are mutually exclusive")
-			return
-		end
-	elseif opts.program then
-		for _, arg in ipairs(opts.program) do
-			table.insert(args, arg)
-		end
-	end
-	wezterm.exec(args, function(code)
-		if code ~= 0 then
-			err("split pane")
-		end
-	end)
-end
-
-function wezterm.set_tab_title(title, id)
-	if not title then
-		return
-	end
-	local args = { "cli", "set-tab-title" }
-	if id then
-		table.insert(args, "--tab-id")
-		table.insert(args, fmt("%d", id))
-		table.insert(args, title)
-	else
-		table.insert(args, title)
-	end
-	wezterm.exec(args, function(code, _signal)
-		if code ~= 0 then
-			err("set tab title to '" .. title .. (id == nil and "'" or "' for tab " .. id))
-		end
-	end)
-end
-
-function wezterm.set_win_title(title, id)
-	if not title then
-		return
-	end
-	local args = { "cli", "set-window-title" }
-	if id then
-		table.insert(args, "--window-id")
-		table.insert(args, fmt("%d", id))
-		table.insert(args, title)
-	else
-		table.insert(args, title)
-	end
-	wezterm.exec(args, function(code, _signal)
-		if code ~= 0 then
-			err("set window title to '" .. title .. (id == nil and "'" or ("' for window " .. id)))
-		end
-	end)
-end
-
----@param program string
----@class SpawnOpts
----Set the current pane
----@field pane? number
----Open in a new window
----@field new_window? boolean
----Set the workspace for the new window (requires new window)
----@field workspace? string
----Set the cwd for the spawned program
----@field cwd? string
----@param opts SpawnOpts
 ---Spawn a program in wezterm
+---@param program string
+---@param opts Wezterm.SpawnOpts
 function wezterm.spawn(program, opts)
 	opts = opts or {}
 	local args = { "cli", "spawn" }
@@ -207,8 +88,126 @@ function wezterm.spawn(program, opts)
 	end)
 end
 
----@param relno number The relative number of tabs to switch
+---Split a pane vertically
+---@param opts Wezterm.SplitOpts
+function wezterm.split_pane.vertical(opts)
+	opts = opts or {}
+	local args = { "cli", "split-pane" }
+	if opts.top then
+		table.insert(args, "--top")
+	end
+	if opts.percent then
+		table.insert(args, "--percent")
+		table.insert(args, fmt("%d", opts.percent))
+	end
+	if opts.pane then
+		table.insert(args, "--pane-id")
+		table.insert(args, fmt("%d", opts.pane))
+	end
+	if opts.top_level then
+		table.insert(args, "--top-level")
+	end
+	if opts.move_pane then
+		if opts.program then
+			err("split: move_pane and program are mutually exclusive")
+			return
+		end
+	elseif opts.program then
+		for _, arg in ipairs(opts.program) do
+			table.insert(args, arg)
+		end
+	end
+	wezterm.exec(args, function(code)
+		if code ~= 0 then
+			err("split pane")
+		end
+	end)
+end
+
+---Split a pane horizontally
+---@param opts Wezterm.SplitOpts
+function wezterm.split_pane.horizontal(opts)
+	opts = opts or {}
+	local args = { "cli", "split-pane" }
+	if opts.left then
+		table.insert(args, "--left")
+	else
+		table.insert(args, "--horizontal")
+	end
+	if opts.percent then
+		table.insert(args, "--percent")
+		table.insert(args, fmt("%d", opts.percent))
+	end
+	if opts.pane then
+		table.insert(args, "--pane-id")
+		table.insert(args, fmt("%d", opts.pane))
+	end
+	if opts.top_level then
+		table.insert(args, "--top-level")
+	end
+	if opts.move_pane then
+		if opts.program then
+			err("split: move_pane and program are mutually exclusive")
+			return
+		end
+	elseif opts.program then
+		for _, arg in ipairs(opts.program) do
+			table.insert(args, arg)
+		end
+	end
+	wezterm.exec(args, function(code)
+		if code ~= 0 then
+			err("split pane")
+		end
+	end)
+end
+
+---Set the title of a Wezterm tab
+---@param title string
+---@param id number
+function wezterm.set_tab_title(title, id)
+	if not title then
+		return
+	end
+	local args = { "cli", "set-tab-title" }
+	if id then
+		table.insert(args, "--tab-id")
+		table.insert(args, fmt("%d", id))
+		table.insert(args, title)
+	else
+		table.insert(args, title)
+	end
+	wezterm.exec(args, function(code, _signal)
+		if code ~= 0 then
+			err("set tab title to '" .. title .. (id == nil and "'" or "' for tab " .. id))
+		end
+	end)
+end
+
+---Set the the title of a Wezterm window
+---@param title string
+---@param id number
+function wezterm.set_win_title(title, id)
+	if not title then
+		return
+	end
+	local args = { "cli", "set-window-title" }
+	if id then
+		table.insert(args, "--window-id")
+		table.insert(args, fmt("%d", id))
+		table.insert(args, title)
+	else
+		table.insert(args, title)
+	end
+	wezterm.exec(args, function(code, _signal)
+		if code ~= 0 then
+			err("set window title to '" .. title .. (id == nil and "'" or ("' for window " .. id)))
+		end
+	end)
+end
+
 ---Switch to the tab relative to the current tab
+---@param relno number The relative number of tabs to switch
 function wezterm.switch_tab.relative(relno)
 	if not relno then
 		relno = vim.v.count or 0
@@ -220,8 +219,8 @@ function wezterm.switch_tab.relative(relno)
 	end)
 end
 
----@param index number The absolute index of the tab to switch to
 ---Switch to the tab with the given index
+---@param index number The absolute index of the tab to switch to
 function wezterm.switch_tab.index(index)
 	if not index then
 		index = vim.v.count or 0
@@ -233,8 +232,8 @@ function wezterm.switch_tab.index(index)
 	end)
 end
 
----@param id number The id of the tab to switch to
 ---Switch to the tab with the given id
+---@param id number The id of the tab to switch to
 function wezterm.switch_tab.id(id)
 	if not id then
 		id = vim.v.count or 0
@@ -246,8 +245,8 @@ function wezterm.switch_tab.id(id)
 	end)
 end
 
----@param id number The id of the pane to switch to
 ---Switch to the given pane
+---@param id number The id of the pane to switch to
 function wezterm.switch_pane.id(id)
 	if not id then
 		id = vim.v.count or 0
@@ -269,8 +268,8 @@ local directions = {
 	Prev = true,
 }
 
----@param direction "Up"|"Down"|"Left"|"Right"|"Next"|"Prev" The direction to switch to
 ---Switch pane in the given direction
+---@param direction 'Up' | 'Down' | 'Left' | 'Right' | 'Next' | 'Prev' The direction to switch to
 function wezterm.switch_pane.direction(direction)
 	if not direction or not directions[direction] then
 		return
@@ -282,6 +281,7 @@ function wezterm.switch_pane.direction(direction)
 	end)
 end
 
+---@private
 function wezterm.create_commands()
 	vim.api.nvim_create_user_command("WeztermSpawn", "lua require('wezterm').spawn(<f-args>)", {
 		nargs = "*",
@@ -289,10 +289,15 @@ function wezterm.create_commands()
 	})
 end
 
+---@private
+---@class Wezterm.Config
+---@field create_commands boolean
 local config = {
 	create_commands = true,
 }
 
+---@private
+---@param opts Wezterm.Config
 function wezterm.setup(opts)
 	opts = vim.tbl_deep_extend("force", config, opts or {})
 
