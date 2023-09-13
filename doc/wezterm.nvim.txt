@@ -31,7 +31,7 @@ wezterm.set_user_var({name}, {value})                     *wezterm.set_user_var*
 
     Parameters: ~
         {name}   (string)
-        {value}  (any)
+        {value}  (string|number|boolean|table|nil)
 
 
 wezterm.spawn({program}, {opts})                                 *wezterm.spawn*
