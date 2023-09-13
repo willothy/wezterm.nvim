@@ -48,7 +48,7 @@ end
 
 ---Set a user var in the current wezterm pane
 ---@param name string
----@param value any
+---@param value string | number | boolean | table | nil
 function wezterm.set_user_var(name, value)
   local base64_encode = function(data)
     local b =
@@ -85,7 +85,7 @@ function wezterm.set_user_var(name, value)
     value = ""
   end
 
-  local template = "\x1b]1337;UserVar=%s=%s\a"
+  local template = "\x1b]1337;SetUserVar=%s=%s\a"
   local command = template:format(name, base64_encode(tostring(value)))
   vim.api.nvim_chan_send(vim.v.stderr, command)
 end
