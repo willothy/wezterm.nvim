@@ -46,6 +46,49 @@ function wezterm.exec(args, handler)
 	uv.spawn(wezterm_executable, { args = args }, handler)
 end
 
+---Set a user var in the current wezterm pane
+---@param name string
+---@param value any
+function wezterm.set_user_var(name, value)
+	local base64_encode = function(data)
+		local b = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+		return (
+			(data:gsub(".", function(x)
+				local r, b = "", x:byte()
+				for i = 8, 1, -1 do
+					r = r .. (b % 2 ^ i - b % 2 ^ (i - 1) > 0 and "1" or "0")
+				end
+				return r
+			end) .. "0000"):gsub("%d%d%d?%d?%d?%d?", function(x)
+				if #x < 6 then
+					return ""
+				end
+				local c = 0
+				for i = 1, 6 do
+					c = c + (x:sub(i, i) == "1" and 2 ^ (6 - i) or 0)
+				end
+				return b:sub(c + 1, c + 1)
+			end) .. ({ "", "==", "=" })[#data % 3 + 1]
+		)
+	end
+
+	local ty = type(value)
+
+	if ty == "table" then
+		value = vim.json.encode(value)
+	elseif ty == "function" or ty == "thread" then
+		error("cannot serialize " .. ty)
+	elseif ty == "boolean" then
+		value = value and "true" or "false"
+	elseif ty == "nil" then
+		value = ""
+	end
+
+	local template = "\x1b]1337;UserVar=%s=%s\a"
+	local command = template:format(name, base64_encode(tostring(value)))
+	vim.api.nvim_chan_send(vim.v.stderr, command)
+end
+
 ---Spawn a program in wezterm
 ---@param program string
 ---@param opts Wezterm.SpawnOpts

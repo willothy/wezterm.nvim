@@ -26,6 +26,14 @@ wezterm.exec({args}, {handler})                                   *wezterm.exec*
         {handler}  (fun(exit_code:any,signal:any))
 
 
+wezterm.set_user_var({name}, {value})                     *wezterm.set_user_var*
+    Set a user var in the current wezterm pane
+
+    Parameters: ~
+        {name}   (string)
+        {value}  (any)
+
+
 wezterm.spawn({program}, {opts})                                 *wezterm.spawn*
     Spawn a program in wezterm
 
