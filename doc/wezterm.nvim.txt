@@ -40,7 +40,16 @@ wezterm.exec({args}, {handler})                                   *wezterm.exec*
         {handler}  (fun(exit_code:any,signal:any))
 
 
-wezterm.exec_sync()                                          *wezterm.exec_sync*
+wezterm.exec_sync({args})                                    *wezterm.exec_sync*
+    Synchronously exec an arbitrary command in wezterm
+
+    Parameters: ~
+        {args}  (string[])
+
+    Returns: ~
+        (boolean)  success
+        (string)   stdout
+        (string)   stderr
 
 
 wezterm.set_user_var({name}, {value})                     *wezterm.set_user_var*
