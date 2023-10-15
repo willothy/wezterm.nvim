@@ -11,7 +11,7 @@ local wezterm = {
 local did_setup = false
 
 ---@private
-local wezterm_executable = ""
+local wezterm_executable
 
 ---@private
 local function err(e)
@@ -20,8 +20,8 @@ end
 
 ---@private
 local function exit_handler(msg)
-  return function(code)
-    if code ~= 0 then
+  return function(obj)
+    if obj.code ~= 0 then
       err(msg)
     end
   end
@@ -38,13 +38,6 @@ local function find_wezterm()
 
   err("find 'wezterm' executable")
   return nil
-end
-
----@private
-local function ensure_setup()
-  if not did_setup then
-    wezterm.setup({})
-  end
 end
 
 ---@class Wezterm.SplitOpts
@@ -74,12 +67,14 @@ end
 
 ---Exec an arbitrary command in wezterm (does not return result)
 ---@param args string[]
----@param handler fun(exit_code, signal)
+---@param handler fun(res: vim.SystemObj)
 function wezterm.exec(args, handler)
-  if not ensure_setup() then
+  if not wezterm.setup({}) then
     return
   end
-  uv.spawn(wezterm_executable, { args = args }, handler)
+  vim.system({ wezterm_executable, unpack(args) }, {
+    text = true,
+  }, handler)
 end
 
 ---Synchronously exec an arbitrary command in wezterm
@@ -88,7 +83,7 @@ end
 ---@return string stdout
 ---@return string stderr
 function wezterm.exec_sync(args)
-  if not ensure_setup() then
+  if not wezterm.setup({}) then
     return false, "", ""
   end
   local rv = vim
@@ -247,7 +242,7 @@ end
 
 ---Set the title of a Wezterm tab
 ---@param title string
----@param id number
+---@param id number | nil Tab id
 function wezterm.set_tab_title(title, id)
   if not title then
     return
@@ -272,7 +267,7 @@ end
 
 ---Set the the title of a Wezterm window
 ---@param title string
----@param id number
+---@param id number | nil Window id
 function wezterm.set_win_title(title, id)
   if not title then
     return
@@ -469,12 +464,12 @@ local config = {
 
 ---@param opts Wezterm.Config
 function wezterm.setup(opts)
-  opts = vim.tbl_deep_extend("force", config, opts or {})
-
   if did_setup then
-    return true
+    return wezterm_executable ~= nil
   end
   did_setup = true
+
+  opts = vim.tbl_deep_extend("force", config, opts or {})
 
   local exe = find_wezterm()
   if not exe then
