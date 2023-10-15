@@ -37,7 +37,7 @@ wezterm.exec({args}, {handler})                                   *wezterm.exec*
 
     Parameters: ~
         {args}     (string[])
-        {handler}  (fun(exit_code:any,signal:any))
+        {handler}  (fun(res:vim.SystemObj))
 
 
 wezterm.exec_sync({args})                                    *wezterm.exec_sync*
@@ -87,7 +87,7 @@ wezterm.set_tab_title({title}, {id})                     *wezterm.set_tab_title*
 
     Parameters: ~
         {title}  (string)
-        {id}     (number)
+        {id}     (number|nil)  Tab id
 
 
 wezterm.set_win_title({title}, {id})                     *wezterm.set_win_title*
@@ -95,7 +95,7 @@ wezterm.set_win_title({title}, {id})                     *wezterm.set_win_title*
 
     Parameters: ~
         {title}  (string)
-        {id}     (number)
+        {id}     (number|nil)  Window id
 
 
 wezterm.switch_tab.relative({relno})               *wezterm.switch_tab.relative*
