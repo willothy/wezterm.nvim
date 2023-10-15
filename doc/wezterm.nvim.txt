@@ -126,10 +126,12 @@ wezterm.switch_pane.id({id})                            *wezterm.switch_pane.id*
         {id}  (number)  The id of the pane to switch to
 
 
-wezterm.get_pane_direction({pane})                  *wezterm.get_pane_direction*
+                                                    *wezterm.get_pane_direction*
+wezterm.get_pane_direction({dir}, {pane})
 
     Parameters: ~
-        {pane}  (integer|nil)  Specify the current pane
+        {dir}   ("Up"|"Down"|"Left"|"Right"|"Next"|"Prev")
+        {pane}  (integer|nil)                               Specify the current pane
 
 
 wezterm.get_text({opts})                                      *wezterm.get_text*
