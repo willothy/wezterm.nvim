@@ -1,10 +1,33 @@
 local uv = vim.loop
 local fmt = string.format
 
+local wezterm = {
+  switch_tab = {},
+  switch_pane = {},
+  split_pane = {},
+}
+
+---@private
+local did_setup = false
+
+---@private
+local wezterm_executable = ""
+
+---@private
 local function err(e)
   vim.notify("Wezterm failed to " .. e, vim.log.levels.ERROR, {})
 end
 
+---@private
+local function exit_handler(msg)
+  return function(code)
+    if code ~= 0 then
+      err(msg)
+    end
+  end
+end
+
+---@private
 local function find_wezterm()
   if vim.fn.executable("wezterm") ~= 0 then
     return "wezterm"
@@ -17,13 +40,12 @@ local function find_wezterm()
   return nil
 end
 
-local wezterm = {
-  switch_tab = {},
-  switch_pane = {},
-  split_pane = {},
-}
-
-local wezterm_executable = ""
+---@private
+local function ensure_setup()
+  if not did_setup then
+    wezterm.setup({})
+  end
+end
 
 ---@class Wezterm.SplitOpts
 ---@field cwd string|nil
@@ -44,11 +66,36 @@ local wezterm_executable = ""
 ---@field cwd string|nil Set the cwd for the spawned program
 ---@field args string[]|nil Additional args to pass to the spawned program
 
+---@class Wezterm.GetTextOpts
+---@field pane_id number|nil
+---@field start_line number|nil
+---@field end_line number|nil
+---@field escapes boolean|nil Include escape sequences in the output
+
 ---Exec an arbitrary command in wezterm (does not return result)
 ---@param args string[]
 ---@param handler fun(exit_code, signal)
 function wezterm.exec(args, handler)
+  if not ensure_setup() then
+    return
+  end
   uv.spawn(wezterm_executable, { args = args }, handler)
+end
+
+---Synchronously exec an arbitrary command in wezterm
+---@param args string[]
+---@return boolean success, string stdout, string stderr
+function wezterm.exec_sync(args)
+  if not ensure_setup() then
+    return false, "", ""
+  end
+  local rv = vim
+    .system({ wezterm_executable, unpack(args) }, {
+      text = true,
+    })
+    :wait()
+
+  return rv.code == 0, rv.stdout, rv.stderr
 end
 
 ---Set a user var in the current wezterm pane
@@ -130,11 +177,8 @@ function wezterm.spawn(program, opts)
     end
   end
 
-  wezterm.exec(args, function(code, _signal)
-    if code ~= 0 then
-      err("spawn " .. program .. " " .. table.concat(args, " "))
-    end
-  end)
+  local emsg = "spawn " .. program .. " " .. table.concat(args, " ")
+  wezterm.exec(args, exit_handler(emsg))
 end
 
 ---@param args string[]
@@ -180,11 +224,7 @@ function wezterm.split_pane.vertical(opts)
   else
     table.insert(args, "--vertical")
   end
-  wezterm.exec(args, function(code)
-    if code ~= 0 then
-      err("split pane")
-    end
-  end)
+  wezterm.exec(args, exit_handler("split pane"))
 end
 
 ---Split a pane horizontally
@@ -200,11 +240,7 @@ function wezterm.split_pane.horizontal(opts)
   else
     table.insert(args, "--horizontal")
   end
-  wezterm.exec(args, function(code)
-    if code ~= 0 then
-      err("split pane")
-    end
-  end)
+  wezterm.exec(args, exit_handler("split pane"))
 end
 
 ---Set the title of a Wezterm tab
@@ -222,15 +258,14 @@ function wezterm.set_tab_title(title, id)
   else
     table.insert(args, title)
   end
-  wezterm.exec(args, function(code, _signal)
-    if code ~= 0 then
-      err(
-        "set tab title to '"
-          .. title
-          .. (id == nil and "'" or "' for tab " .. id)
-      )
-    end
-  end)
+  wezterm.exec(
+    args,
+    exit_handler(
+      "set tab title to '"
+        .. title
+        .. (id == nil and "'" or "' for tab " .. id)
+    )
+  )
 end
 
 ---Set the the title of a Wezterm window
@@ -248,15 +283,14 @@ function wezterm.set_win_title(title, id)
   else
     table.insert(args, title)
   end
-  wezterm.exec(args, function(code, _signal)
-    if code ~= 0 then
-      err(
-        "set window title to '"
-          .. title
-          .. (id == nil and "'" or ("' for window " .. id))
-      )
-    end
-  end)
+  wezterm.exec(
+    args,
+    exit_handler(
+      "set window title to '"
+        .. title
+        .. (id == nil and "'" or ("' for window " .. id))
+    )
+  )
 end
 
 ---Switch to the tab relative to the current tab
@@ -267,11 +301,7 @@ function wezterm.switch_tab.relative(relno)
   end
   wezterm.exec(
     { "cli", "activate-tab", "--tab-relative", fmt("%d", relno) },
-    function(code, _signal)
-      if code ~= 0 then
-        err("activate tab relative " .. relno)
-      end
-    end
+    exit_handler("activate tab relative " .. relno)
   )
 end
 
@@ -283,11 +313,7 @@ function wezterm.switch_tab.index(index)
   end
   wezterm.exec(
     { "cli", "activate-tab", "--tab-index", fmt("%d", index) },
-    function(code, _signal)
-      if code ~= 0 then
-        err("activate tab by index " .. index)
-      end
-    end
+    exit_handler("activate tab by index " .. index)
   )
 end
 
@@ -299,11 +325,7 @@ function wezterm.switch_tab.id(id)
   end
   wezterm.exec(
     { "cli", "activate-tab", "--tab-id", fmt("%d", id) },
-    function(code, _signal)
-      if code ~= 0 then
-        err("activate tab by id " .. id)
-      end
-    end
+    exit_handler("activate tab by id " .. id)
   )
 end
 
@@ -315,11 +337,7 @@ function wezterm.switch_pane.id(id)
   end
   wezterm.exec(
     { "cli", "activate-pane", "--pane-id", fmt("%d", id) },
-    function(code, _signal)
-      if code ~= 0 then
-        err("activate pane by id " .. id)
-      end
-    end
+    exit_handler("activate pane by id " .. id)
   )
 end
 
@@ -333,20 +351,99 @@ local directions = {
   Prev = true,
 }
 
----Switch pane in the given direction
----@param direction 'Up' | 'Down' | 'Left' | 'Right' | 'Next' | 'Prev' The direction to switch to
-function wezterm.switch_pane.direction(direction)
-  if not direction or not directions[direction] then
+---@param dir "Up" | "Down" | "Left" | "Right" | "Next" | "Prev"
+---@param pane integer | nil Specify the current pane
+function wezterm.get_pane_direction(dir, pane)
+  if not dir then
+    err("dir is required for get-pane-direction")
+  end
+  local first_char = dir:sub(1, 1)
+  dir = first_char:upper() .. dir:sub(2, -1)
+
+  if not directions[dir] then
+    err("get pane: invalid direction " .. vim.inspect(dir))
+  end
+
+  local args = { "cli", "get-pane-direction" }
+
+  if pane then
+    table.insert(args, "--pane-id")
+    table.insert(args, pane)
+  end
+
+  table.insert(args, dir)
+
+  local ok, pane_id, errmsg = wezterm.exec_sync(args)
+
+  if not ok then
+    errmsg("get pane direction: " .. errmsg)
     return
   end
-  wezterm.exec(
-    { "cli", "activate-pane-direction", direction },
-    function(code, _signal)
-      if code ~= 0 then
-        err("activate pane by direction " .. direction)
-      end
-    end
-  )
+
+  pane_id = pane_id:gsub("^%s+", ""):gsub("%s+$", "")
+
+  return tonumber(pane_id)
+end
+
+---@param opts Wezterm.GetTextOpts
+function wezterm.get_text(opts)
+  local args = {}
+
+  if opts.pane_id then
+    table.insert(args, "--pane-id")
+    table.insert(args, opts.pane_id)
+  end
+
+  if opts.start_line then
+    table.insert(args, "--start-line")
+    table.insert(args, opts.start_line)
+  end
+
+  if opts.end_line then
+    table.insert(args, "--end-line")
+    table.insert(args, opts.end_line)
+  end
+
+  if opts.escapes then
+    table.insert(args, "--escapes")
+  end
+
+  local ok, stdout, stderr = wezterm.exec_sync(args)
+
+  if not ok then
+    err("get text: " .. stderr)
+    return
+  end
+
+  return stdout
+end
+
+---Switch pane in the given direction
+---@param dir 'Up' | 'Down' | 'Left' | 'Right' | 'Next' | 'Prev' The direction to switch to
+---@param pane integer | nil Specify the current pane
+function wezterm.switch_pane.direction(dir, pane)
+  if not dir then
+    err("dir is required for split-pane")
+  end
+
+  local first_char = dir:sub(1, 1)
+  dir = first_char:upper() .. dir:sub(2, -1)
+
+  if not directions[dir] then
+    err("switch pane: invalid direction " .. vim.inspect(dir))
+    return
+  end
+
+  local args = { "cli", "activate-pane-direction" }
+
+  if pane then
+    table.insert(args, "--pane-id")
+    table.insert(args, pane)
+  end
+
+  table.insert(args, dir)
+
+  wezterm.exec(args, exit_handler("activate pane by direction " .. dir))
 end
 
 ---@private
@@ -363,21 +460,32 @@ end
 
 ---@private
 ---@class Wezterm.Config
----@field create_commands boolean
+---@field create_commands boolean | nil
 local config = {
   create_commands = true,
 }
 
----@private
 ---@param opts Wezterm.Config
 function wezterm.setup(opts)
   opts = vim.tbl_deep_extend("force", config, opts or {})
 
-  wezterm_executable = find_wezterm()
+  if did_setup then
+    return true
+  end
+  did_setup = true
+
+  local exe = find_wezterm()
+  if not exe then
+    err("find 'wezterm' executable")
+    return false
+  end
+  wezterm_executable = exe
 
   if opts.create_commands == true then
     wezterm.create_commands()
   end
+
+  return true
 end
 
 return wezterm
