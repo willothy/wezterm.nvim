@@ -353,7 +353,7 @@ local directions = {
   Prev = true,
 }
 
----@param dir "Up" | "Down" | "Left" | "Right" | "Next" | "Prev"
+---@param dir 'Up' | 'Down' | 'Left' | 'Right' | 'Next' | 'Prev'
 ---@param pane integer | nil Specify the current pane
 function wezterm.get_pane_direction(dir, pane)
   if not dir then
