@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.0](https://github.com/willothy/wezterm.nvim/compare/v0.1.1...v0.2.0) (2023-10-15)
+
+
+### Features
+
+* `get_pane_direction` and `get_text` ([1fa2495](https://github.com/willothy/wezterm.nvim/commit/1fa2495fdb795c166be3480f3edde100cd469ad7))
+* add `exec_sync` function for sync commands ([1fa2495](https://github.com/willothy/wezterm.nvim/commit/1fa2495fdb795c166be3480f3edde100cd469ad7))
+
+
+### Bug Fixes
+
+* **docs:** docgen for multi-return in exec_sync ([07ab4bd](https://github.com/willothy/wezterm.nvim/commit/07ab4bdf3592ffdaac2ac5b08e48a2a6867fd5bc))
+* ensure setup when calling `exec` or `exec_sync` ([1fa2495](https://github.com/willothy/wezterm.nvim/commit/1fa2495fdb795c166be3480f3edde100cd469ad7))
+
 ## [0.1.1](https://github.com/willothy/wezterm.nvim/compare/v0.1.0...v0.1.1) (2023-10-15)
 
 
