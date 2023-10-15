@@ -26,18 +26,23 @@ local wezterm = {
 local wezterm_executable = ""
 
 ---@class Wezterm.SplitOpts
----@field pane? number The pane to split (default current)
----@field top? boolean (default false)
----@field move_pane? number|nil Move a pane instead of spawning a command in it (default nil/disabled)
----@field percent? number|nil The percentage of the pane to split (default nil)
+---@field cwd string?
+---@field pane number? The pane to split (default current)
+---@field top boolean? (default false)
+---@field left boolean? (default false)
+---@field bottom boolean? (default false)
+---@field right boolean? (default false)
+---@field move_pane number? Move a pane instead of spawning a command in it (default nil/disabled)
+---@field percent number? The percentage of the pane to split (default nil)
 ---@field program string[]|nil The program to spawn in the new pane (default nil/Wezterm default)
----@field top_level boolean Split the window instead of the pane (default false)-
+---@field top_level boolean? Split the window instead of the pane (default false)-
 
 ---@class Wezterm.SpawnOpts
----@field pane? number Set the current pane
----@field new_window? boolean Open in a new window
----@field workspace? string Set the workspace for the new window (requires new window)
----@field cwd? string Set the cwd for the spawned program
+---@field pane number? Set the current pane
+---@field new_window boolean? Open in a new window
+---@field workspace string? Set the workspace for the new window (requires new window)
+---@field cwd string? Set the cwd for the spawned program
+---@field args string[]? Additional args to pass to the spawned program
 
 ---Exec an arbitrary command in wezterm (does not return result)
 ---@param args string[]
@@ -51,7 +56,7 @@ end
 ---@param value string | number | boolean | table | nil
 function wezterm.set_user_var(name, value)
   local base64_encode = function(data)
-    local b =
+    local chars =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
     return (
       (data:gsub(".", function(x)
@@ -68,7 +73,7 @@ function wezterm.set_user_var(name, value)
         for i = 1, 6 do
           c = c + (x:sub(i, i) == "1" and 2 ^ (6 - i) or 0)
         end
-        return b:sub(c + 1, c + 1)
+        return chars:sub(c + 1, c + 1)
       end) .. ({ "", "==", "=" })[#data % 3 + 1]
     )
   end
@@ -132,13 +137,12 @@ function wezterm.spawn(program, opts)
   end)
 end
 
----Split a pane vertically
+---@param args string[]
 ---@param opts Wezterm.SplitOpts
-function wezterm.split_pane.vertical(opts)
-  opts = opts or {}
-  local args = { "cli", "split-pane" }
-  if opts.top then
-    table.insert(args, "--top")
+local function split_pane_args(args, opts)
+  if opts.cwd then
+    table.insert(args, "--cwd")
+    table.insert(args, opts.cwd)
   end
   if opts.percent then
     table.insert(args, "--percent")
@@ -160,6 +164,21 @@ function wezterm.split_pane.vertical(opts)
     for _, arg in ipairs(opts.program) do
       table.insert(args, arg)
     end
+  end
+end
+
+---Split a pane vertically
+---@param opts Wezterm.SplitOpts
+function wezterm.split_pane.vertical(opts)
+  opts = opts or {}
+  local args = { "cli", "split-pane" }
+  split_pane_args(args, opts)
+  if opts.top then
+    table.insert(args, "--top")
+  elseif opts.bottom then
+    table.insert(args, "--bottom")
+  else
+    table.insert(args, "--vertical")
   end
   wezterm.exec(args, function(code)
     if code ~= 0 then
@@ -173,31 +192,13 @@ end
 function wezterm.split_pane.horizontal(opts)
   opts = opts or {}
   local args = { "cli", "split-pane" }
+  split_pane_args(args, opts)
   if opts.left then
     table.insert(args, "--left")
+  elseif opts.right then
+    table.insert(args, "--right")
   else
     table.insert(args, "--horizontal")
-  end
-  if opts.percent then
-    table.insert(args, "--percent")
-    table.insert(args, fmt("%d", opts.percent))
-  end
-  if opts.pane then
-    table.insert(args, "--pane-id")
-    table.insert(args, fmt("%d", opts.pane))
-  end
-  if opts.top_level then
-    table.insert(args, "--top-level")
-  end
-  if opts.move_pane then
-    if opts.program then
-      err("split: move_pane and program are mutually exclusive")
-      return
-    end
-  elseif opts.program then
-    for _, arg in ipairs(opts.program) do
-      table.insert(args, arg)
-    end
   end
   wezterm.exec(args, function(code)
     if code ~= 0 then

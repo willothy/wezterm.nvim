@@ -122,7 +122,9 @@ wezterm.split_pane.vertical(opts)
 
 - opts (table):
   - pane? (number): The pane to split (default current)
-  - top? (boolean): Place the pane on top (default bottom)
+  - top? (boolean): Place the pane on top
+  - bottom? (boolean): Place the pane on bottom
+  - cwd? (string): Set the cwd for the spawned program
   - percent? (number): The percentage of the pane that the split should take up (default 50%)
   - top_level? (boolean): Split the top level window instead of the selected pane
   - move_pane? (boolean): Move the pane instead of spawning a command in it (cannot be used with program)
@@ -136,7 +138,9 @@ wezterm.split_pane.horizontal(opts)
 
 - opts (table):
   - pane? (number): The pane to split (default current)
-  - left? (boolean): Place the pane on the left (default right)
+  - left? (boolean): Place the pane on the left
+  - right? (boolean): Place the pane on the right
+  - cwd? (string): Set the cwd for the spawned program
   - percent? (number): The percentage of the pane that the split should take up (default 50%)
   - top_level? (boolean): Split the top level window instead of the selected pane
   - move_pane? (boolean): Move the pane instead of spawning a command in it (cannot be used with program)
