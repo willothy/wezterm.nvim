@@ -26,23 +26,23 @@ local wezterm = {
 local wezterm_executable = ""
 
 ---@class Wezterm.SplitOpts
----@field cwd string?
----@field pane number? The pane to split (default current)
----@field top boolean? (default false)
----@field left boolean? (default false)
----@field bottom boolean? (default false)
----@field right boolean? (default false)
----@field move_pane number? Move a pane instead of spawning a command in it (default nil/disabled)
----@field percent number? The percentage of the pane to split (default nil)
+---@field cwd string|nil
+---@field pane number|nil The pane to split (default current)
+---@field top boolean|nil (default false)
+---@field left boolean|nil (default false)
+---@field bottom boolean|nil (default false)
+---@field right boolean|nil (default false)
+---@field move_pane number|nil Move a pane instead of spawning a command in it (default nil/disabled)
+---@field percent number|nil The percentage of the pane to split (default nil)
 ---@field program string[]|nil The program to spawn in the new pane (default nil/Wezterm default)
----@field top_level boolean? Split the window instead of the pane (default false)-
+---@field top_level boolean|nil Split the window instead of the pane (default false)-
 
 ---@class Wezterm.SpawnOpts
----@field pane number? Set the current pane
----@field new_window boolean? Open in a new window
----@field workspace string? Set the workspace for the new window (requires new window)
----@field cwd string? Set the cwd for the spawned program
----@field args string[]? Additional args to pass to the spawned program
+---@field pane number|nil Set the current pane
+---@field new_window boolean|nil Open in a new window
+---@field workspace string|nil Set the workspace for the new window (requires new window)
+---@field cwd string|nil Set the cwd for the spawned program
+---@field args string[]|nil Additional args to pass to the spawned program
 
 ---Exec an arbitrary command in wezterm (does not return result)
 ---@param args string[]
