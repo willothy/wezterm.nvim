@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/willothy/wezterm.nvim/compare/v0.2.0...v0.2.1) (2023-10-15)
+
+
+### Bug Fixes
+
+* **docs:** docgen for `dir` enum in get_pane_direction ([d8290f3](https://github.com/willothy/wezterm.nvim/commit/d8290f37d47956641eb975c7c0f32c92d0cf9c98))
+* ensure setup, don't run without executable ([e0e331a](https://github.com/willothy/wezterm.nvim/commit/e0e331afccff50c0707352c73b2bb59523cab79f))
+
 ## [0.2.0](https://github.com/willothy/wezterm.nvim/compare/v0.1.1...v0.2.0) (2023-10-15)
 
 
