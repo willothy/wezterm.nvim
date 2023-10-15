@@ -23,12 +23,24 @@ Wezterm.SpawnOpts                                            *Wezterm.SpawnOpts*
         {args}        (string[]|nil)  Additional args to pass to the spawned program
 
 
+Wezterm.GetTextOpts                                        *Wezterm.GetTextOpts*
+
+    Fields: ~
+        {pane_id}     (number|nil)
+        {start_line}  (number|nil)
+        {end_line}    (number|nil)
+        {escapes}     (boolean|nil)  Include escape sequences in the output
+
+
 wezterm.exec({args}, {handler})                                   *wezterm.exec*
     Exec an arbitrary command in wezterm (does not return result)
 
     Parameters: ~
         {args}     (string[])
         {handler}  (fun(exit_code:any,signal:any))
+
+
+wezterm.exec_sync()                                          *wezterm.exec_sync*
 
 
 wezterm.set_user_var({name}, {value})                     *wezterm.set_user_var*
@@ -105,12 +117,31 @@ wezterm.switch_pane.id({id})                            *wezterm.switch_pane.id*
         {id}  (number)  The id of the pane to switch to
 
 
+wezterm.get_pane_direction({pane})                  *wezterm.get_pane_direction*
+
+    Parameters: ~
+        {pane}  (integer|nil)  Specify the current pane
+
+
+wezterm.get_text({opts})                                      *wezterm.get_text*
+
+    Parameters: ~
+        {opts}  (Wezterm.GetTextOpts)
+
+
                                                  *wezterm.switch_pane.direction*
-wezterm.switch_pane.direction({direction})
+wezterm.switch_pane.direction({dir}, {pane})
     Switch pane in the given direction
 
     Parameters: ~
-        {direction}  ("Up"|"Down"|"Left"|"Right"|"Next"|"Prev")  The direction to switch to
+        {dir}   ("Up"|"Down"|"Left"|"Right"|"Next"|"Prev")  The direction to switch to
+        {pane}  (integer|nil)                               Specify the current pane
+
+
+wezterm.setup({opts})                                            *wezterm.setup*
+
+    Parameters: ~
+        {opts}  (Wezterm.Config)
 
 
 vim:tw=78:ts=8:noet:ft=help:norl:
