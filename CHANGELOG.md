@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/willothy/wezterm.nvim/compare/v0.1.0...v0.1.1) (2023-10-15)
+
+
+### Bug Fixes
+
+* docgen for optional keys ([bd77470](https://github.com/willothy/wezterm.nvim/commit/bd774700bf897cf487c84de464b93bf32799502c))
+
 ## 0.1.0 (2023-10-15)
 
 
