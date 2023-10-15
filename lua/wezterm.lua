@@ -84,7 +84,9 @@ end
 
 ---Synchronously exec an arbitrary command in wezterm
 ---@param args string[]
----@return boolean success, string stdout, string stderr
+---@return boolean success
+---@return string stdout
+---@return string stderr
 function wezterm.exec_sync(args)
   if not ensure_setup() then
     return false, "", ""
