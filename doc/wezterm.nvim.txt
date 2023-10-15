@@ -1,13 +1,26 @@
 Wezterm.SplitOpts                                            *Wezterm.SplitOpts*
 
     Fields: ~
-        {cwd}  (string)
+        {cwd}        (string|nil)
+        {pane}       (number|nil)    The pane to split (default current)
+        {top}        (boolean|nil)   (default false)
+        {left}       (boolean|nil)   (default false)
+        {bottom}     (boolean|nil)   (default false)
+        {right}      (boolean|nil)   (default false)
+        {move_pane}  (number|nil)    Move a pane instead of spawning a command in it (default nil/disabled)
+        {percent}    (number|nil)    The percentage of the pane to split (default nil)
+        {program}    (string[]|nil)  The program to spawn in the new pane (default nil/Wezterm default)
+        {top_level}  (boolean|nil)   Split the window instead of the pane (default false)-
 
 
 Wezterm.SpawnOpts                                            *Wezterm.SpawnOpts*
 
     Fields: ~
-        {pane}  (number)
+        {pane}        (number|nil)    Set the current pane
+        {new_window}  (boolean|nil)   Open in a new window
+        {workspace}   (string|nil)    Set the workspace for the new window (requires new window)
+        {cwd}         (string|nil)    Set the cwd for the spawned program
+        {args}        (string[]|nil)  Additional args to pass to the spawned program
 
 
 wezterm.exec({args}, {handler})                                   *wezterm.exec*
