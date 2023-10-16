@@ -134,6 +134,23 @@ wezterm.get_pane_direction({dir}, {pane})
         {pane}  (integer|nil)                               Specify the current pane
 
 
+wezterm.current_pane()                                    *wezterm.current_pane*
+    Get the id of the current pane
+
+    Returns: ~
+        (number|nil)
+
+
+wezterm.zoom_pane({pane}, {opts})                            *wezterm.zoom_pane*
+    Zoom or unzoom a pane.
+
+    If no options are provided, toggles zoom for the provided (or current) pane.
+
+    Parameters: ~
+        {pane}  (number|nil)                                    The pane to zoom (default current)
+        {opts}  ({zoom:boolean,unzoom:boolean,toggle:boolean})  # Default: { toggle = true }
+
+
 wezterm.get_text({opts})                                      *wezterm.get_text*
 
     Parameters: ~
