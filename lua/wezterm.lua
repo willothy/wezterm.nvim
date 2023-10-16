@@ -40,6 +40,17 @@ local function find_wezterm()
   return nil
 end
 
+---@private
+local function count_non_nil(...)
+  local n = 0
+  for i = 1, select("#", ...) do
+    if select(i, ...) ~= nil then
+      n = n + 1
+    end
+  end
+  return n
+end
+
 ---@class Wezterm.SplitOpts
 ---@field cwd string|nil
 ---@field pane number|nil The pane to split (default current)
@@ -380,6 +391,40 @@ function wezterm.get_pane_direction(dir, pane)
   pane_id = pane_id:gsub("^%s+", ""):gsub("%s+$", "")
 
   return tonumber(pane_id)
+end
+
+---Get the id of the current pane
+---@return number | nil
+function wezterm.current_pane()
+  local id = vim.env.WEZTERM_PANE
+  if id then
+    id = id:gsub("^%s+", ""):gsub("%s+$", "")
+    return tonumber(id)
+  end
+end
+
+---Zoom or unzoom a pane.
+---
+---If no options are provided, toggles zoom for the provided (or current) pane.
+---@param pane number | nil The pane to zoom (default current)
+---@param opts { zoom: boolean, unzoom: boolean, toggle: boolean } # Default: { toggle = true }
+function wezterm.zoom_pane(pane, opts)
+  opts = opts or {}
+  local args = { "cli", "zoom-pane" }
+
+  if count_non_nil(opts.zoom, opts.unzoom, opts.toggle) > 1 then
+    err("zoom pane: 'zoom', 'unzoom', and 'toggle' are mutually exclusive")
+    return
+  end
+
+  if opts.zoom then
+    table.insert(args, "--zoom")
+  elseif opts.unzoom then
+    table.insert(args, "--unzoom")
+  else
+    table.insert(args, "--toggle")
+  end
+  wezterm.exec(args, exit_handler("zoom pane"))
 end
 
 ---@param opts Wezterm.GetTextOpts
