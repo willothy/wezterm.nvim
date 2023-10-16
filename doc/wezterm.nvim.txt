@@ -1,4 +1,4 @@
-Wezterm.SplitOpts                                            *Wezterm.SplitOpts*
+wezterm.SplitOpts                                            *wezterm.SplitOpts*
 
     Fields: ~
         {cwd}        (string|nil)
@@ -13,7 +13,7 @@ Wezterm.SplitOpts                                            *Wezterm.SplitOpts*
         {top_level}  (boolean|nil)   Split the window instead of the pane (default false)-
 
 
-Wezterm.SpawnOpts                                            *Wezterm.SpawnOpts*
+wezterm.SpawnOpts                                            *wezterm.SpawnOpts*
 
     Fields: ~
         {pane}        (number|nil)    Set the current pane
@@ -23,7 +23,7 @@ Wezterm.SpawnOpts                                            *Wezterm.SpawnOpts*
         {args}        (string[]|nil)  Additional args to pass to the spawned program
 
 
-Wezterm.GetTextOpts                                        *Wezterm.GetTextOpts*
+wezterm.GetTextOpts                                        *wezterm.GetTextOpts*
 
     Fields: ~
         {pane_id}     (number|nil)
@@ -65,21 +65,21 @@ wezterm.spawn({program}, {opts})                                 *wezterm.spawn*
 
     Parameters: ~
         {program}  (string)
-        {opts}     (Wezterm.SpawnOpts)
+        {opts}     (wezterm.SpawnOpts)
 
 
 wezterm.split_pane.vertical({opts})                *wezterm.split_pane.vertical*
     Split a pane vertically
 
     Parameters: ~
-        {opts}  (Wezterm.SplitOpts)
+        {opts}  (wezterm.SplitOpts)
 
 
 wezterm.split_pane.horizontal({opts})            *wezterm.split_pane.horizontal*
     Split a pane horizontally
 
     Parameters: ~
-        {opts}  (Wezterm.SplitOpts)
+        {opts}  (wezterm.SplitOpts)
 
 
 wezterm.set_tab_title({title}, {id})                     *wezterm.set_tab_title*
@@ -154,7 +154,7 @@ wezterm.zoom_pane({pane}, {opts})                            *wezterm.zoom_pane*
 wezterm.get_text({opts})                                      *wezterm.get_text*
 
     Parameters: ~
-        {opts}  (Wezterm.GetTextOpts)
+        {opts}  (wezterm.GetTextOpts)
 
 
                                                  *wezterm.switch_pane.direction*
@@ -169,7 +169,7 @@ wezterm.switch_pane.direction({dir}, {pane})
 wezterm.setup({opts})                                            *wezterm.setup*
 
     Parameters: ~
-        {opts}  (Wezterm.Config)
+        {opts}  (wezterm.Config)
 
 
 vim:tw=78:ts=8:noet:ft=help:norl:
