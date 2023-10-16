@@ -51,7 +51,7 @@ local function count_non_nil(...)
   return n
 end
 
----@class Wezterm.SplitOpts
+---@class wezterm.SplitOpts
 ---@field cwd string|nil
 ---@field pane number|nil The pane to split (default current)
 ---@field top boolean|nil (default false)
@@ -63,14 +63,14 @@ end
 ---@field program string[]|nil The program to spawn in the new pane (default nil/Wezterm default)
 ---@field top_level boolean|nil Split the window instead of the pane (default false)-
 
----@class Wezterm.SpawnOpts
+---@class wezterm.SpawnOpts
 ---@field pane number|nil Set the current pane
 ---@field new_window boolean|nil Open in a new window
 ---@field workspace string|nil Set the workspace for the new window (requires new window)
 ---@field cwd string|nil Set the cwd for the spawned program
 ---@field args string[]|nil Additional args to pass to the spawned program
 
----@class Wezterm.GetTextOpts
+---@class wezterm.GetTextOpts
 ---@field pane_id number|nil
 ---@field start_line number|nil
 ---@field end_line number|nil
@@ -152,7 +152,7 @@ end
 
 ---Spawn a program in wezterm
 ---@param program string
----@param opts Wezterm.SpawnOpts
+---@param opts wezterm.SpawnOpts
 function wezterm.spawn(program, opts)
   opts = opts or {}
   local args = { "cli", "spawn" }
@@ -190,7 +190,7 @@ function wezterm.spawn(program, opts)
 end
 
 ---@param args string[]
----@param opts Wezterm.SplitOpts
+---@param opts wezterm.SplitOpts
 local function split_pane_args(args, opts)
   if opts.cwd then
     table.insert(args, "--cwd")
@@ -220,7 +220,7 @@ local function split_pane_args(args, opts)
 end
 
 ---Split a pane vertically
----@param opts Wezterm.SplitOpts
+---@param opts wezterm.SplitOpts
 function wezterm.split_pane.vertical(opts)
   opts = opts or {}
   local args = { "cli", "split-pane" }
@@ -236,7 +236,7 @@ function wezterm.split_pane.vertical(opts)
 end
 
 ---Split a pane horizontally
----@param opts Wezterm.SplitOpts
+---@param opts wezterm.SplitOpts
 function wezterm.split_pane.horizontal(opts)
   opts = opts or {}
   local args = { "cli", "split-pane" }
@@ -427,7 +427,7 @@ function wezterm.zoom_pane(pane, opts)
   wezterm.exec(args, exit_handler("zoom pane"))
 end
 
----@param opts Wezterm.GetTextOpts
+---@param opts wezterm.GetTextOpts
 function wezterm.get_text(opts)
   local args = {}
 
@@ -501,13 +501,13 @@ function wezterm.create_commands()
 end
 
 ---@private
----@class Wezterm.Config
+---@class wezterm.Config
 ---@field create_commands boolean | nil
 local config = {
   create_commands = true,
 }
 
----@param opts Wezterm.Config
+---@param opts wezterm.Config
 function wezterm.setup(opts)
   if did_setup then
     return wezterm_executable ~= nil
