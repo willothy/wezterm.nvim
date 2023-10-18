@@ -395,7 +395,7 @@ end
 
 ---Get the id of the current pane
 ---@return number | nil
-function wezterm.current_pane()
+function wezterm.get_current_pane()
   local id = vim.env.WEZTERM_PANE
   if id then
     id = id:gsub("^%s+", ""):gsub("%s+$", "")
