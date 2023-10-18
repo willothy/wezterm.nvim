@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.0](https://github.com/willothy/wezterm.nvim/compare/v0.2.1...v0.3.0) (2023-10-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename `current_pane` to `get_current_pane`
+
+### Features
+
+* add `list_panes` and `list_clients` ([cbc9c72](https://github.com/willothy/wezterm.nvim/commit/cbc9c7257fdbf6a057b6b09da2c0bd5f168a5e80))
+* add `zoom_pane` and `current_pane` functions ([cd852a9](https://github.com/willothy/wezterm.nvim/commit/cd852a96b29866b7a70b84c9d3e9b86ba80fff65))
+* rename `current_pane` to `get_current_pane` ([961e8f8](https://github.com/willothy/wezterm.nvim/commit/961e8f8e4f24eaae89458805836331072df3b31d))
+
+
+### Bug Fixes
+
+* use provided pane-id in `zoom_pane` ([f8f2cfe](https://github.com/willothy/wezterm.nvim/commit/f8f2cfe8981c01306dce2f062972a0ef8b69e9d9))
+
 ## [0.2.1](https://github.com/willothy/wezterm.nvim/compare/v0.2.0...v0.2.1) (2023-10-15)
 
 
