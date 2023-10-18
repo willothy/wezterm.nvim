@@ -134,7 +134,7 @@ wezterm.get_pane_direction({dir}, {pane})
         {pane}  (integer|nil)                               Specify the current pane
 
 
-wezterm.current_pane()                                    *wezterm.current_pane*
+wezterm.get_current_pane()                            *wezterm.get_current_pane*
     Get the id of the current pane
 
     Returns: ~
@@ -164,6 +164,18 @@ wezterm.switch_pane.direction({dir}, {pane})
     Parameters: ~
         {dir}   ("Up"|"Down"|"Left"|"Right"|"Next"|"Prev")  The direction to switch to
         {pane}  (integer|nil)                               Specify the current pane
+
+
+wezterm.list_panes()                                        *wezterm.list_panes*
+    @text Wrapper around `wezterm cli list`
+
+    @return table[]?
+
+
+wezterm.list_clients()                                    *wezterm.list_clients*
+    Wrapper around `wezterm cli list-clients`
+
+    @return table[]?
 
 
 wezterm.setup({opts})                                            *wezterm.setup*
