@@ -417,6 +417,11 @@ function wezterm.zoom_pane(pane, opts)
     return
   end
 
+  if pane then
+    table.insert(args, "--pane-id")
+    table.insert(args, pane)
+  end
+
   if opts.zoom then
     table.insert(args, "--zoom")
   elseif opts.unzoom then
