@@ -488,6 +488,56 @@ function wezterm.switch_pane.direction(dir, pane)
   wezterm.exec(args, exit_handler("activate pane by direction " .. dir))
 end
 
+local function trim(str)
+  return str:gsub("^%s+", ""):gsub("%s+$", "")
+end
+
+---@text Wrapper around `wezterm cli list`
+---
+---@return table[]?
+function wezterm.list_panes()
+  local ok, stdout, stderr =
+    wezterm.exec_sync({ "cli", "list", "--format", "json" })
+  if not ok then
+    err("list panes: " .. stderr)
+    return
+  end
+  local decoded, obj = pcall(vim.json.decode, trim(stdout), {
+    luanil = {
+      object = true,
+      array = true,
+    },
+  })
+  if not decoded then
+    err("list panes: " .. obj)
+    return
+  end
+  return obj
+end
+
+---Wrapper around `wezterm cli list-clients`
+---
+---@return table[]?
+function wezterm.list_clients()
+  local ok, stdout, stderr =
+    wezterm.exec_sync({ "cli", "list-clients", "--format", "json" })
+  if not ok then
+    err("list panes: " .. stderr)
+    return
+  end
+  local decoded, obj = pcall(vim.json.decode, trim(stdout), {
+    luanil = {
+      object = true,
+      array = true,
+    },
+  })
+  if not decoded then
+    err("list panes: " .. obj)
+    return
+  end
+  return obj
+end
+
 ---@private
 function wezterm.create_commands()
   vim.api.nvim_create_user_command(
