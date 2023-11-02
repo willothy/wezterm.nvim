@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/willothy/wezterm.nvim/compare/v0.3.0...v0.3.1) (2023-11-02)
+
+
+### Bug Fixes
+
+* `vim.schedule_wrap` exit handlers ([6b4d853](https://github.com/willothy/wezterm.nvim/commit/6b4d853fb1c11ad7718924316b2840b786db46fa))
+* remove invalid 'vertical' flag ([6b4d853](https://github.com/willothy/wezterm.nvim/commit/6b4d853fb1c11ad7718924316b2840b786db46fa)), closes [#9](https://github.com/willothy/wezterm.nvim/issues/9)
+
 ## [0.3.0](https://github.com/willothy/wezterm.nvim/compare/v0.2.1...v0.3.0) (2023-10-18)
 
 
