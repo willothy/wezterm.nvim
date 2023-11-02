@@ -85,7 +85,7 @@ function wezterm.exec(args, handler)
   end
   vim.system({ wezterm_executable, unpack(args) }, {
     text = true,
-  }, handler)
+  }, vim.schedule_wrap(handler))
 end
 
 ---Synchronously exec an arbitrary command in wezterm
@@ -229,8 +229,6 @@ function wezterm.split_pane.vertical(opts)
     table.insert(args, "--top")
   elseif opts.bottom then
     table.insert(args, "--bottom")
-  else
-    table.insert(args, "--vertical")
   end
   wezterm.exec(args, exit_handler("split pane"))
 end
