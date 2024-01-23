@@ -1,6 +1,9 @@
 name: generate documentation
 
-on: [push]
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
 
 env:
   PLUGIN_NAME: wezterm.nvim
