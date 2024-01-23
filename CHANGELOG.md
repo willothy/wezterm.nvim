@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/willothy/wezterm.nvim/compare/v0.3.1...v0.3.2) (2024-01-23)
+
+
+### Bug Fixes
+
+* **0.9:** vendor `vim.system` until 0.10 is released ([#13](https://github.com/willothy/wezterm.nvim/issues/13)) ([9aff645](https://github.com/willothy/wezterm.nvim/commit/9aff6454a08e1f32151235c8d15b86edf8cd8a6d)), closes [#12](https://github.com/willothy/wezterm.nvim/issues/12)
+
 ## [0.3.1](https://github.com/willothy/wezterm.nvim/compare/v0.3.0...v0.3.1) (2023-11-02)
 
 
