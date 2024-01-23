@@ -1,5 +1,9 @@
-local uv = vim.loop
 local fmt = string.format
+
+---@type fun(cmd: string[], args: vim.SystemOpts, handler: fun(res: vim.SystemCompleted)?): vim.SystemObj
+local system
+---@type fun(str: string): string
+local base64
 
 local wezterm = {
   switch_tab = {},
@@ -15,11 +19,14 @@ local wezterm_executable
 
 ---@private
 local function err(e)
-  vim.notify("Wezterm failed to " .. e, vim.log.levels.ERROR, {})
+  vim.notify("Wezterm failed to " .. e, vim.log.levels.ERROR, {
+    title = "Wezterm",
+  })
 end
 
 ---@private
 local function exit_handler(msg)
+  ---@param obj vim.SystemCompleted
   return function(obj)
     if obj.code ~= 0 then
       err(msg)
@@ -83,7 +90,7 @@ function wezterm.exec(args, handler)
   if not wezterm.setup({}) then
     return
   end
-  vim.system({ wezterm_executable, unpack(args) }, {
+  system({ wezterm_executable, unpack(args) }, {
     text = true,
   }, vim.schedule_wrap(handler))
 end
@@ -97,11 +104,9 @@ function wezterm.exec_sync(args)
   if not wezterm.setup({}) then
     return false, "", ""
   end
-  local rv = vim
-    .system({ wezterm_executable, unpack(args) }, {
-      text = true,
-    })
-    :wait()
+  local rv = system({ wezterm_executable, unpack(args) }, {
+    text = true,
+  }):wait()
 
   return rv.code == 0, rv.stdout, rv.stderr
 end
@@ -110,29 +115,6 @@ end
 ---@param name string
 ---@param value string | number | boolean | table | nil
 function wezterm.set_user_var(name, value)
-  local base64_encode = function(data)
-    local chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-    return (
-      (data:gsub(".", function(x)
-        local r, b = "", x:byte()
-        for i = 8, 1, -1 do
-          r = r .. (b % 2 ^ i - b % 2 ^ (i - 1) > 0 and "1" or "0")
-        end
-        return r
-      end) .. "0000"):gsub("%d%d%d?%d?%d?%d?", function(x)
-        if #x < 6 then
-          return ""
-        end
-        local c = 0
-        for i = 1, 6 do
-          c = c + (x:sub(i, i) == "1" and 2 ^ (6 - i) or 0)
-        end
-        return chars:sub(c + 1, c + 1)
-      end) .. ({ "", "==", "=" })[#data % 3 + 1]
-    )
-  end
-
   local ty = type(value)
 
   if ty == "table" then
@@ -146,7 +128,7 @@ function wezterm.set_user_var(name, value)
   end
 
   local template = "\x1b]1337;SetUserVar=%s=%s\a"
-  local command = template:format(name, base64_encode(tostring(value)))
+  local command = template:format(name, base64(tostring(value)))
   vim.api.nvim_chan_send(vim.v.stderr, command)
 end
 
@@ -566,6 +548,22 @@ function wezterm.setup(opts)
     return wezterm_executable ~= nil
   end
   did_setup = true
+
+  -- Use nvim's system if available, otherwise use vendored copy
+  -- until 0.10 is released.
+  if vim.system then
+    system = vim.system
+  else
+    system = require("wezterm.system").run
+  end
+
+  -- Use nvim's base64 if available, otherwise use vendored copy
+  -- until 0.10 is released.
+  if vim.base64 then
+    base64 = vim.base64.encode
+  else
+    base64 = require("wezterm.base64").encode
+  end
 
   opts = vim.tbl_deep_extend("force", config, opts or {})
 
