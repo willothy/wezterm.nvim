@@ -32,7 +32,7 @@ If you don't want the `WeztermSpawn` user command, use
 
 ## Usage
 
-For API documentation, see `:h wezterm.nvim` or `doc/wezterm.nvim.txt`.
+For API documentation, see `:h wezterm.nvim` or [`doc/wezterm.nvim.txt`](./doc/wezterm.nvim.txt).
 
 ### Functions
 
