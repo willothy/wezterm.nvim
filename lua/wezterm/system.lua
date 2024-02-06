@@ -1,4 +1,4 @@
-local uv = vim.uv
+local loop = vim.loop
 
 local SIG = {
   HUP = 1, -- Hangup
@@ -105,11 +105,11 @@ end
 ---@return fun(err:string?, data: string?)? Handler
 local function setup_output(output)
   if output == nil then
-    return assert(uv.new_pipe(false)), nil
+    return assert(loop.new_pipe(false)), nil
   end
 
   if type(output) == "function" then
-    return assert(uv.new_pipe(false)), output
+    return assert(loop.new_pipe(false)), output
   end
 
   assert(output == false)
@@ -129,7 +129,7 @@ local function setup_input(input)
     towrite = input
   end
 
-  return assert(uv.new_pipe(false)), towrite
+  return assert(loop.new_pipe(false)), towrite
 end
 
 --- @return table<string,string>
@@ -192,7 +192,7 @@ local M = {}
 --- @param on_error fun()
 --- @return uv_process_t, integer
 local function spawn(cmd, opts, on_exit, on_error)
-  local handle, pid_or_err = uv.spawn(cmd, opts, on_exit)
+  local handle, pid_or_err = loop.spawn(cmd, opts, on_exit)
   if not handle then
     on_error()
     error(pid_or_err)
@@ -204,7 +204,7 @@ end
 ---@param cb fun()
 ---@return uv_timer_t
 local function timer_oneshot(timeout, cb)
-  local timer = assert(uv.new_timer())
+  local timer = assert(loop.new_timer())
   timer:start(timeout, 0, function()
     timer:stop()
     timer:close()
@@ -216,7 +216,7 @@ end
 local function _on_exit(state, code, signal, on_exit)
   close_handles(state)
 
-  local check = assert(uv.new_check())
+  local check = assert(loop.new_check())
   check:start(function()
     for _, pipe in pairs({ state.stdin, state.stdout, state.stderr }) do
       if not pipe:is_closing() then
