@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.3](https://github.com/willothy/wezterm.nvim/compare/v0.3.2...v0.3.3) (2024-02-06)
+
+
+### Bug Fixes
+
+* **0.9:** use `vim.loop` in vendored `vim.system` ([#16](https://github.com/willothy/wezterm.nvim/issues/16)) ([9c8e58f](https://github.com/willothy/wezterm.nvim/commit/9c8e58f8918b2b883d11bf6589786cefbbaea310))
+
 ## [0.3.2](https://github.com/willothy/wezterm.nvim/compare/v0.3.1...v0.3.2) (2024-01-23)
 
 
