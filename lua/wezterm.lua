@@ -477,9 +477,52 @@ local function trim(str)
   return str:gsub("^%s+", ""):gsub("%s+$", "")
 end
 
+---@text The size of a Wezterm pane
+---@class Wezterm.PaneSize
+---@field cols integer
+---@field rows integer
+---@field pixel_width integer
+---@field pixel_height integer
+---@field dpi integer
+
+---@text Information about a Wezterm pane
+---@class Wezterm.Pane
+---@field cursor_shape string
+---@field cursor_visibility string
+---@field cursor_x integer
+---@field cursor_y integer
+---@field cwd string
+---@field is_active boolean
+---@field is_zoomed boolean
+---@field left_col integer
+---@field pane_id integer
+---@field size Wezterm.PaneSize
+---@field tab_id integer
+---@field tab_title string
+---@field title string
+---@field top_row integer
+---@field tty_name string
+---@field window_id integer
+---@field window_title string
+---@field workspace string
+
+---@text Information about a Wezterm tab
+---@class Wezterm.Tab
+---@field tab_id integer
+---@field tab_title string
+---@field window_id integer
+---@field window_title string
+---@field panes Wezterm.Pane[]
+
+---@text Information about a Wezterm GUI window
+---@class Wezterm.Window
+---@field window_id integer
+---@field window_title string
+---@field tabs Wezterm.Tab[]
+
 ---@text Wrapper around `wezterm cli list`
 ---
----@return table[]?
+---@return Wezterm.Pane[]?
 function wezterm.list_panes()
   local ok, stdout, stderr =
     wezterm.exec_sync({ "cli", "list", "--format", "json" })
@@ -498,6 +541,61 @@ function wezterm.list_panes()
     return
   end
   return obj
+end
+
+---@text Wrapper around `wezterm cli list`
+---
+---@return Wezterm.Tab[]?
+function wezterm.list_tabs()
+  local tabs = {}
+  local by_id = {}
+  local panes = wezterm.list_panes()
+  if not panes then
+    return
+  end
+  for _, pane in ipairs(panes) do
+    local tab_id = pane.tab_id
+    if not by_id[tab_id] then
+      by_id[tab_id] = {
+        tab_id = tab_id,
+        tab_title = pane.tab_title,
+        window_id = pane.window_id,
+        window_title = pane.window_title,
+        panes = {},
+      }
+      table.insert(tabs, by_id[tab_id])
+    end
+    table.insert(by_id[tab_id].panes, pane)
+  end
+  return tabs
+end
+
+---@text Wrapper around `wezterm cli list`
+---
+---@return Wezterm.Window[]?
+function wezterm.list_windows()
+  local windows = {}
+  local by_id = {}
+
+  local tabs = wezterm.list_tabs()
+  if not tabs then
+    return
+  end
+
+  for _, tab in ipairs(tabs) do
+    local window_id = tab.window_id
+    if not by_id[window_id] then
+      by_id[window_id] = {
+        window_id = window_id,
+        window_title = tab.window_title,
+        tabs = {},
+      }
+      table.insert(windows, by_id[window_id])
+    end
+    table.insert(by_id[window_id].tabs, tab)
+  end
+
+  return windows
 end
 
 ---Wrapper around `wezterm cli list-clients`
