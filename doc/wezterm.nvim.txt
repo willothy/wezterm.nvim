@@ -166,10 +166,77 @@ wezterm.switch_pane.direction({dir}, {pane})
         {pane}  (integer|nil)                               Specify the current pane
 
 
+Wezterm.PaneSize                                              *Wezterm.PaneSize*
+    @text The size of a Wezterm pane
+
+    Fields: ~
+        {cols}          (integer)
+        {rows}          (integer)
+        {pixel_width}   (integer)
+        {pixel_height}  (integer)
+        {dpi}           (integer)
+
+
+Wezterm.Pane                                                      *Wezterm.Pane*
+    @text Information about a Wezterm pane
+
+    Fields: ~
+        {cursor_shape}       (string)
+        {cursor_visibility}  (string)
+        {cursor_x}           (integer)
+        {cursor_y}           (integer)
+        {cwd}                (string)
+        {is_active}          (boolean)
+        {is_zoomed}          (boolean)
+        {left_col}           (integer)
+        {pane_id}            (integer)
+        {size}               (Wezterm.PaneSize)
+        {tab_id}             (integer)
+        {tab_title}          (string)
+        {title}              (string)
+        {top_row}            (integer)
+        {tty_name}           (string)
+        {window_id}          (integer)
+        {window_title}       (string)
+        {workspace}          (string)
+
+
+Wezterm.Tab                                                        *Wezterm.Tab*
+    @text Information about a Wezterm tab
+
+    Fields: ~
+        {tab_id}        (integer)
+        {tab_title}     (string)
+        {window_id}     (integer)
+        {window_title}  (string)
+        {panes}         (Wezterm.Pane[])
+
+
+Wezterm.Window                                                  *Wezterm.Window*
+    @text Information about a Wezterm GUI window
+
+    Fields: ~
+        {window_id}     (integer)
+        {window_title}  (string)
+        {tabs}          (Wezterm.Tab[])
+
+
 wezterm.list_panes()                                        *wezterm.list_panes*
     @text Wrapper around `wezterm cli list`
 
-    @return table[]?
+    @return Wezterm.Pane[]?
+
+
+wezterm.list_tabs()                                          *wezterm.list_tabs*
+    @text Wrapper around `wezterm cli list`
+
+    @return Wezterm.Tab[]?
+
+
+wezterm.list_windows()                                    *wezterm.list_windows*
+    @text Wrapper around `wezterm cli list`
+
+    @return Wezterm.Window[]?
 
 
 wezterm.list_clients()                                    *wezterm.list_clients*
