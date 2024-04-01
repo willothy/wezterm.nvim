@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.0](https://github.com/willothy/wezterm.nvim/compare/v0.3.2...v0.4.0) (2024-04-01)
+
+
+### Features
+
+* add `list_wins` and `list_tabs` ([3d26bcc](https://github.com/willothy/wezterm.nvim/commit/3d26bcc27fecc98799188c13b2129536beb3dcaa))
+* type annotations for `Window`, `Pane`, and `Tab` info ([3d26bcc](https://github.com/willothy/wezterm.nvim/commit/3d26bcc27fecc98799188c13b2129536beb3dcaa))
+
+
+### Bug Fixes
+
+* **0.9:** use `vim.loop` in vendored `vim.system` ([#16](https://github.com/willothy/wezterm.nvim/issues/16)) ([9c8e58f](https://github.com/willothy/wezterm.nvim/commit/9c8e58f8918b2b883d11bf6589786cefbbaea310))
+
 ## [0.3.2](https://github.com/willothy/wezterm.nvim/compare/v0.3.1...v0.3.2) (2024-01-23)
 
 
