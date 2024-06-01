@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/willothy/wezterm.nvim/compare/v0.4.0...v0.5.0) (2024-06-01)
+
+
+### Features
+
+* add `wezterm.notify` to show desktop notifications from wezterm ([2078cf2](https://github.com/willothy/wezterm.nvim/commit/2078cf29de7ec1d3c49152c26cdd5fa568467352))
+
 ## [0.4.0](https://github.com/willothy/wezterm.nvim/compare/v0.3.2...v0.4.0) (2024-04-01)
 
 
