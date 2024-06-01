@@ -1,10 +1,5 @@
 local fmt = string.format
 
----@type fun(cmd: string[], args: vim.SystemOpts, handler: fun(res: vim.SystemCompleted)?): vim.SystemObj
-local system
----@type fun(str: string): string
-local base64
-
 local wezterm = {
   switch_tab = {},
   switch_pane = {},
@@ -90,7 +85,7 @@ function wezterm.exec(args, handler)
   if not wezterm.setup({}) then
     return
   end
-  system({ wezterm_executable, unpack(args) }, {
+  vim.system({ wezterm_executable, unpack(args) }, {
     text = true,
   }, vim.schedule_wrap(handler))
 end
@@ -104,9 +99,11 @@ function wezterm.exec_sync(args)
   if not wezterm.setup({}) then
     return false, "", ""
   end
-  local rv = system({ wezterm_executable, unpack(args) }, {
-    text = true,
-  }):wait()
+  local rv = vim
+    .system({ wezterm_executable, unpack(args) }, {
+      text = true,
+    })
+    :wait()
 
   return rv.code == 0, rv.stdout, rv.stderr
 end
@@ -128,7 +125,7 @@ function wezterm.set_user_var(name, value)
   end
 
   local template = "\x1b]1337;SetUserVar=%s=%s\a"
-  local command = template:format(name, base64(tostring(value)))
+  local command = template:format(name, vim.base64.encode(tostring(value)))
   vim.api.nvim_chan_send(vim.v.stderr, command)
 end
 
@@ -647,23 +644,17 @@ function wezterm.setup(opts)
   end
   did_setup = true
 
-  -- Use nvim's system if available, otherwise use vendored copy
-  -- until 0.10 is released.
-  if vim.system then
-    system = vim.system
-  else
-    system = require("wezterm.system").run
-  end
-
-  -- Use nvim's base64 if available, otherwise use vendored copy
-  -- until 0.10 is released.
-  if vim.base64 then
-    base64 = vim.base64.encode
-  else
-    base64 = require("wezterm.base64").encode
-  end
-
   opts = vim.tbl_deep_extend("force", config, opts or {})
+
+  if vim.system == nil or vim.base64 == nil then
+    vim.notify_once(
+      "Wezterm.nvim requires Neovim >= 0.10. If you are using an older version, consider upgrading or pinning v0.4.0 of this plugin.",
+      vim.log.levels.ERROR,
+      {
+        title = "Wezterm",
+      }
+    )
+  end
 
   local exe = find_wezterm()
   if not exe then
