@@ -60,6 +60,14 @@ wezterm.set_user_var({name}, {value})                     *wezterm.set_user_var*
         {value}  (string|number|boolean|table|nil)
 
 
+wezterm.notify({title}, {body})                                 *wezterm.notify*
+    Show a desktop notification from wezterm
+
+    Parameters: ~
+        {title}  (string)
+        {body}   (string)
+
+
 wezterm.spawn({program}, {opts})                                 *wezterm.spawn*
     Spawn a program in wezterm
 
