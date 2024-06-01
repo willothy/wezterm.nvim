@@ -8,7 +8,7 @@ Utilities for interacting with the wezterm cli through Lua/neovim. Spawn tasks a
 
 ## Installation
 
-> Note: Requires Neovim >= 0.9
+> Note: Requires Neovim >= 0.10
 
 With `folke/lazy.nvim`
 
