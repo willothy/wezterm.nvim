@@ -129,6 +129,15 @@ function wezterm.set_user_var(name, value)
   vim.api.nvim_chan_send(vim.v.stderr, command)
 end
 
+---Show a desktop notification from wezterm
+---@param title string
+---@param body string
+function wezterm.notify(title, body)
+  local template = "\x1b]777;notify;%s;%s\x1b\\"
+  local command = template:format(title or "", body or "")
+  vim.api.nvim_chan_send(vim.v.stderr, command)
+end
+
 ---Spawn a program in wezterm
 ---@param program string
 ---@param opts wezterm.SpawnOpts
