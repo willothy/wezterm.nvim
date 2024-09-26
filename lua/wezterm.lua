@@ -81,11 +81,13 @@ end
 ---Exec an arbitrary command in wezterm (does not return result)
 ---@param args string[]
 ---@param handler fun(res: vim.SystemObj)
-function wezterm.exec(args, handler)
+---@param stdin string|string[]|boolean If `true`, then a pipe to stdin is opened and can be written to via the `write()` method to SystemObj. If string or string[] then will be written to stdin
+function wezterm.exec(args, handler, stdin)
   if not wezterm.setup({}) then
     return
   end
   vim.system({ wezterm_executable, unpack(args) }, {
+    stdin = stdin,
     text = true,
   }, vim.schedule_wrap(handler))
 end
@@ -477,6 +479,29 @@ function wezterm.switch_pane.direction(dir, pane)
   table.insert(args, dir)
 
   wezterm.exec(args, exit_handler("activate pane by direction " .. dir))
+end
+
+---Send text to a pane
+---@param text string Text to send
+---@param pane integer | nil Specify thecurrent pane
+---@param no_paste boolean|nil (default false)
+function wezterm.send_text(text, pane, no_paste)
+  if not text then
+    err("text is required for send-text")
+  end
+
+  local args = { "cli", "send-text" }
+
+  if pane then
+    table.insert(args, "--pane-id")
+    table.insert(args, pane)
+  end
+
+  if no_paste then
+    table.insert(args, "--no-paste")
+  end
+
+  wezterm.exec(args, exit_handler("send text to pane"), text)
 end
 
 local function trim(str)
