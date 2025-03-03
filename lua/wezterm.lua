@@ -1,3 +1,4 @@
+local Path = require("plenary.path")
 local fmt = string.format
 
 local wezterm = {
@@ -164,7 +165,8 @@ function wezterm.spawn(program, opts)
   end
   if opts.cwd then
     args:insert("--cwd")
-    args:insert(opts.cwd)
+    local path = Path:new(opts.cwd)
+    args:insert(path:expand())
   end
   if program then
     args:insert(program)
