@@ -30,7 +30,10 @@ local function exit_handler(msg)
 end
 
 ---@private
-local function find_wezterm()
+local function find_wezterm(opts)
+  if opts.executable and vim.fn.executable(opts.executable) ~= 0 then
+    return opts.executable
+  end
   if vim.fn.executable("wezterm") ~= 0 then
     return "wezterm"
   end
@@ -667,8 +670,10 @@ end
 ---@private
 ---@class wezterm.Config
 ---@field create_commands boolean | nil
+---@field executable string | nil wezterm executable path
 local config = {
   create_commands = true,
+  executable = "wezterm",
 }
 
 ---@param opts wezterm.Config
@@ -690,7 +695,7 @@ function wezterm.setup(opts)
     )
   end
 
-  local exe = find_wezterm()
+  local exe = find_wezterm(opts)
   if not exe then
     err("find 'wezterm' executable")
     return false
