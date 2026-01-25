@@ -203,6 +203,7 @@ local function split_pane_args(args, opts)
       return
     end
   elseif opts.program then
+    table.insert(args, "--")
     for _, arg in ipairs(opts.program) do
       table.insert(args, arg)
     end
@@ -214,12 +215,12 @@ end
 function wezterm.split_pane.vertical(opts)
   opts = opts or {}
   local args = { "cli", "split-pane" }
-  split_pane_args(args, opts)
   if opts.top then
     table.insert(args, "--top")
   elseif opts.bottom then
     table.insert(args, "--bottom")
   end
+  split_pane_args(args, opts)
   wezterm.exec(args, exit_handler("split pane"))
 end
 
@@ -228,7 +229,6 @@ end
 function wezterm.split_pane.horizontal(opts)
   opts = opts or {}
   local args = { "cli", "split-pane" }
-  split_pane_args(args, opts)
   if opts.left then
     table.insert(args, "--left")
   elseif opts.right then
@@ -236,6 +236,7 @@ function wezterm.split_pane.horizontal(opts)
   else
     table.insert(args, "--horizontal")
   end
+  split_pane_args(args, opts)
   wezterm.exec(args, exit_handler("split pane"))
 end
 
