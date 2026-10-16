@@ -19,7 +19,7 @@ With `folke/lazy.nvim`
 }
 ```
 
-If you don't want the `WeztermSpawn` user command, use
+If you don't want the `WeztermSpawn` and `WeztermGetText` user commands, use
 
 ```lua
 {
@@ -47,4 +47,33 @@ vim.keymap.set("n", "<leader>wt", require('wezterm').switch_tab.index)
 
 ### User command
 
-Use `WeztermSpawn <command> <args>...` to spawn a task in a new WezTerm tab.
+Use `:WeztermSpawn <command> <args>...` to spawn a task in a new WezTerm tab.
+Use `:WeztermSpawn` without arguments to open a new tab with WezTerm's default
+program (usually a shell).
+
+Use `:WeztermGetText` to select a pane and open its text in a scratch split.
+If Telescope is available, it provides the pane picker; otherwise the command
+uses `vim.ui.select`. Cancelling the picker leaves your buffers unchanged.
+
+You can specify the pane directly and include scrollback with a negative
+`start_line`:
+
+```vim
+:WeztermGetText pane_id=3
+:WeztermGetText pane_id=3 start_line=-200
+:WeztermGetText start_line=-200
+```
+
+Both options are optional. Without `pane_id`, the command always opens the pane
+picker. Without `start_line`, it captures the terminal screen without scrollback.
+
+## Tests
+
+Run from the repository root (Neovim >= 0.10):
+
+```sh
+nvim --headless -u NONE -l tests/commands.lua
+```
+
+The tests mock the WezTerm process and Telescope modules, so they do not require
+a running WezTerm instance or an installed Telescope.
